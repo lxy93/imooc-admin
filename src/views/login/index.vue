@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <el-form class="login-form">
+    <el-form :model="loginForm" :rules="loginRules" class="login-form">
       <div class="title-container">
         <h3 class="title">用户登录</h3>
       </div>
@@ -9,21 +9,33 @@
         <span class="svg-container">
           <el-icon>
             <span class="svg-container">
-              <SvgIcon icon="https://res.lgdsunday.club/user.svg" />
+              <svg-icon icon="user"></svg-icon>
             </span>
           </el-icon>
         </span>
-        <el-input placeholder="username" name="username" type="text" />
+        <el-input
+          v-model="loginForm.username"
+          placeholder="username"
+          name="username"
+          type="text"
+        />
       </el-form-item>
 
       <el-form-item prop="password">
         <span class="svg-container">
-          <SvgIcon icon="https://res.lgdsunday.club/user.svg" />
+          <svg-icon icon="password"></svg-icon>
         </span>
-        <el-input placeholder="password" name="password" />
+        <el-input
+          v-model="loginForm.password"
+          placeholder="password"
+          name="password"
+          :type="passwordType"
+        />
         <span class="show-pwd">
-          <span class="svg-container">
-            <SvgIcon />
+          <span @click="onChangePwdType" class="svg-container">
+            <svg-icon
+              :icon="passwordType === 'password' ? 'eye' : 'eye-open'"
+            ></svg-icon>
           </span>
         </span>
       </el-form-item>
@@ -36,9 +48,22 @@
 </template>
 
 <script setup>
-import { Avatar } from "@element-plus/icons";
-import SvgIcon from "@/components/SvgIcon/index.vue";
-import {} from "vue";
+import { validatorPassword } from "./rules";
+import { ref } from "vue";
+const loginForm = ref({
+  username: "",
+  password: "",
+});
+const loginRules = ref({
+  username: [{ required: true, message: "请输入账号", trigger: "blur" }],
+  password: [
+    { required: true, trigger: "blur", validator: validatorPassword() },
+  ],
+});
+const passwordType = ref("password");
+const onChangePwdType = () => {
+  passwordType.value = passwordType.value === "password" ? "text" : "password";
+};
 </script>
 
 <style lang="scss" scoped>
@@ -68,6 +93,7 @@ $cursor: #fff;
       color: #454545;
     }
     ::v-deep .el-input__wrapper {
+      width: 100%;
       background-color: transparent;
       box-shadow: none;
       &.is-focus {
@@ -113,7 +139,7 @@ $cursor: #fff;
   .show-pwd {
     position: absolute;
     right: 10px;
-    top: 7px;
+    top: 0px;
     font-size: 16px;
     color: $dark_gray;
     cursor: pointer;
