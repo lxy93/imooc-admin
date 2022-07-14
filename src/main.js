@@ -6,6 +6,7 @@ import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import "@/styles/base.scss";
 import installIcons from "@/icons/index.js"; //全局引入内容svg的icon
+import "@/permission";
 
 const app = createApp(App);
 installIcons(app); //赋值给 svg的icon组件 完成全局注册组件

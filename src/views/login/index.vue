@@ -1,6 +1,11 @@
 <template>
   <div class="login-container">
-    <el-form :model="loginForm" :rules="loginRules" class="login-form">
+    <el-form
+      ref="loginFormRef"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+    >
       <div class="title-container">
         <h3 class="title">用户登录</h3>
       </div>
@@ -40,7 +45,11 @@
         </span>
       </el-form-item>
 
-      <el-button type="primary" style="width: 100%; margin-bottom: 30px"
+      <el-button
+        @click="loginClick"
+        :loading="loading"
+        type="primary"
+        style="width: 100%; margin-bottom: 30px"
         >登录</el-button
       >
     </el-form>
@@ -50,9 +59,16 @@
 <script setup>
 import { validatorPassword } from "./rules";
 import { ref } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+const store = useStore();
+const router = useRouter();
+const loginFormRef = ref(null);
+let loading = ref(false);
+
 const loginForm = ref({
-  username: "",
-  password: "",
+  username: "super-admin",
+  password: "123456",
 });
 const loginRules = ref({
   username: [{ required: true, message: "请输入账号", trigger: "blur" }],
@@ -63,6 +79,24 @@ const loginRules = ref({
 const passwordType = ref("password");
 const onChangePwdType = () => {
   passwordType.value = passwordType.value === "password" ? "text" : "password";
+};
+
+const loginClick = () => {
+  loginFormRef.value.validate((valid) => {
+    console.log(valid, "uu");
+    if (!valid) return;
+    loading.value = true;
+    store
+      .dispatch("user/login", loginForm.value)
+      .then(() => {
+        router.push("/");
+        loading.value = false;
+      })
+      .catch((err) => {
+        console.log(err);
+        loading.value = false;
+      });
+  });
 };
 </script>
 
